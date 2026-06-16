@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3"><div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Production Records</p><h3 class="kpi-value">{{ summary.records_count }}</h3></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Total Produced</p><h3 class="kpi-value">{{ summary.produced }}</h3></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Total Assembled</p><h3 class="kpi-value">{{ summary.assembled }}</h3></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Total Delivered</p><h3 class="kpi-value">{{ summary.delivered }}</h3></div></div></div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-1">Daily Production Tracking</h5>
+                <p class="text-muted small mb-0">Create or update records by date and shift</p>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {{ form.hidden_tag() }}
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.production_date.label.text }}</label>
+                        {{ form.production_date(class='form-control') }}
+                        {% for error in form.production_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">{{ form.produced.label.text }}</label>
+                            {{ form.produced(class='form-control', min='0') }}
+                            {% for error in form.produced.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{ form.assembled.label.text }}</label>
+                            {{ form.assembled(class='form-control', min='0') }}
+                            {% for error in form.assembled.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">{{ form.delivered.label.text }}</label>
+                            {{ form.delivered(class='form-control', min='0') }}
+                            {% for error in form.delivered.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">{{ form.shift.label.text }}</label>
+                        {{ form.shift(class='form-select') }}
+                        {% for error in form.shift.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">{{ form.supervisor.label.text }}</label>
+                        {{ form.supervisor(class='form-control', placeholder='Enter supervisor name') }}
+                        {% for error in form.supervisor.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="mt-3">
+                        <label class="form-label">{{ form.notes.label.text }}</label>
+                        {{ form.notes(class='form-control', rows='4', placeholder='Shift notes, delays, observations') }}
+                        {% for error in form.notes.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="d-grid mt-4">
+                        {{ form.submit(class='btn btn-primary') }}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-1">Production Records</h5>
+                <p class="text-muted small mb-0">Summary statistics are calculated automatically</p>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Shift</th>
+                                <th>Produced</th>
+                                <th>Assembled</th>
+                                <th>Delivered</th>
+                                <th>Supervisor</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in records %}
+                                <tr>
+                                    <td>{{ record.production_date.strftime('%d-%m-%Y') }}</td>
+                                    <td>{{ record.shift }}</td>
+                                    <td>{{ record.produced }}</td>
+                                    <td>{{ record.assembled }}</td>
+                                    <td>{{ record.delivered }}</td>
+                                    <td>{{ record.supervisor }}</td>
+                                    <td>{{ record.notes or '-' }}</td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">No production records available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

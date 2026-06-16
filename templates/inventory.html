@@ -1,0 +1,119 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Current Stock</p><h3 class="kpi-value">{{ summary.stock }}</h3></div></div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Consumed Quantity</p><h3 class="kpi-value">{{ summary.consumed }}</h3></div></div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Remaining Quantity</p><h3 class="kpi-value">{{ summary.remaining }}</h3></div></div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Low Stock Items</p><h3 class="kpi-value">{{ summary.low_stock_count }}</h3></div></div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-4">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-1">{{ 'Update Inventory Item' if editing_item else 'Add Inventory Item' }}</h5>
+                <p class="text-muted small mb-0">Track stock, consumption and remaining units</p>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {{ form.hidden_tag() }}
+                    {% if editing_item %}
+                        <input type="hidden" name="inventory_id" value="{{ editing_item.id }}">
+                    {% endif %}
+
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.item_name.label.text }}</label>
+                        {{ form.item_name(class='form-control', placeholder='Enter inventory item name') }}
+                        {% for error in form.item_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.category.label.text }}</label>
+                        {{ form.category(class='form-select') }}
+                        {% for error in form.category.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">{{ form.stock_quantity.label.text }}</label>
+                        {{ form.stock_quantity(class='form-control', min='0') }}
+                        {% for error in form.stock_quantity.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label">{{ form.consumed_quantity.label.text }}</label>
+                        {{ form.consumed_quantity(class='form-control', min='0') }}
+                        {% for error in form.consumed_quantity.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                    </div>
+                    <div class="d-flex gap-2">
+                        {{ form.submit(class='btn btn-primary') }}
+                        {% if editing_item %}
+                            <a href="{{ url_for('main.inventory') }}" class="btn btn-outline-secondary">Cancel</a>
+                        {% endif %}
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-8">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0">
+                <h5 class="mb-1">Inventory Items</h5>
+                <p class="text-muted small mb-0">Raw materials and components across manufacturing categories</p>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item Name</th>
+                                <th>Category</th>
+                                <th>Current Stock</th>
+                                <th>Consumed</th>
+                                <th>Remaining</th>
+                                <th>Last Updated</th>
+                                <th class="text-end">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in inventory_items %}
+                                <tr>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.category }}</td>
+                                    <td>{{ item.stock_quantity }}</td>
+                                    <td>{{ item.consumed_quantity }}</td>
+                                    <td>
+                                        <span class="badge {% if item.remaining_quantity < 50 %}text-bg-danger{% else %}text-bg-success{% endif %}">
+                                            {{ item.remaining_quantity }}
+                                        </span>
+                                    </td>
+                                    <td>{{ item.last_updated.strftime('%d-%m-%Y %H:%M') }}</td>
+                                    <td>
+                                        <div class="d-flex justify-content-end gap-2">
+                                            <a href="{{ url_for('main.inventory', edit=item.id) }}" class="btn btn-sm btn-outline-primary">Edit</a>
+                                            <form method="post" action="{{ url_for('main.delete_inventory', item_id=item.id) }}">
+                                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                                <button type="submit" class="btn btn-sm btn-outline-danger" data-confirm="Delete this inventory item?">Delete</button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-4 text-muted">No inventory items available.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

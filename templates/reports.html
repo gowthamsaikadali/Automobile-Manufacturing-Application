@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label class="form-label">Start Date</label>
+                <input type="date" name="start_date" value="{{ start_date.isoformat() }}" class="form-control">
+            </div>
+            <div class="col-md-4">
+                <label class="form-label">End Date</label>
+                <input type="date" name="end_date" value="{{ end_date.isoformat() }}" class="form-control">
+            </div>
+            <div class="col-md-4 d-grid">
+                <button type="submit" class="btn btn-primary">Generate Report</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3"><div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Records in Range</p><h3 class="kpi-value">{{ report_data.summary.records_count }}</h3></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Produced</p><h3 class="kpi-value">{{ report_data.summary.produced }}</h3></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Assembled</p><h3 class="kpi-value">{{ report_data.summary.assembled }}</h3></div></div></div>
+    <div class="col-sm-6 col-xl-3"><div class="kpi-card card border-0 shadow-sm h-100"><div class="card-body"><p class="kpi-label">Delivered</p><h3 class="kpi-value">{{ report_data.summary.delivered }}</h3></div></div></div>
+</div>
+
+<div class="card border-0 shadow-sm mb-4">
+    <div class="card-header bg-white border-0">
+        <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center">
+            <div>
+                <h5 class="mb-1">CSV Exports</h5>
+                <p class="text-muted small mb-0">Download report snapshots for the selected period</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('main.export_report', report_type='daily') }}?start_date={{ start_date.isoformat() }}&end_date={{ end_date.isoformat() }}">Daily</a>
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('main.export_report', report_type='weekly') }}?start_date={{ start_date.isoformat() }}&end_date={{ end_date.isoformat() }}">Weekly</a>
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('main.export_report', report_type='monthly') }}?start_date={{ start_date.isoformat() }}&end_date={{ end_date.isoformat() }}">Monthly</a>
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('main.export_report', report_type='delivered') }}?start_date={{ start_date.isoformat() }}&end_date={{ end_date.isoformat() }}">Delivered</a>
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('main.export_report', report_type='assembly') }}?start_date={{ start_date.isoformat() }}&end_date={{ end_date.isoformat() }}">Assembly</a>
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('main.export_report', report_type='material-type') }}?start_date={{ start_date.isoformat() }}&end_date={{ end_date.isoformat() }}">Material Type</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-12">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white border-0"><h5 class="mb-0">Daily Production Report</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Shift</th>
+                                <th>Produced</th>
+                                <th>Assembled</th>
+                                <th>Delivered</th>
+                                <th>Supervisor</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for record in report_data.daily_records %}
+                                <tr>
+                                    <td>{{ record.production_date.strftime('%d-%m-%Y') }}</td>
+                                    <td>{{ record.shift }}</td>
+                                    <td>{{ record.produced }}</td>
+                                    <td>{{ record.assembled }}</td>
+                                    <td>{{ record.delivered }}</td>
+                                    <td>{{ record.supervisor }}</td>
+                                    <td>{{ record.notes or '-' }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="7" class="text-center py-4 text-muted">No daily report data available for the selected range.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0"><h5 class="mb-0">Weekly Report</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern mb-0">
+                        <thead><tr><th>Week</th><th>Produced</th><th>Assembled</th><th>Delivered</th></tr></thead>
+                        <tbody>
+                            {% for row in report_data.weekly_summary %}
+                                <tr><td>{{ row.week }}</td><td>{{ row.produced }}</td><td>{{ row.assembled }}</td><td>{{ row.delivered }}</td></tr>
+                            {% else %}
+                                <tr><td colspan="4" class="text-center py-4 text-muted">No weekly data available.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0"><h5 class="mb-0">Monthly Report</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern mb-0">
+                        <thead><tr><th>Month</th><th>Produced</th><th>Assembled</th><th>Delivered</th></tr></thead>
+                        <tbody>
+                            {% for row in report_data.monthly_summary %}
+                                <tr><td>{{ row.month }}</td><td>{{ row.produced }}</td><td>{{ row.assembled }}</td><td>{{ row.delivered }}</td></tr>
+                            {% else %}
+                                <tr><td colspan="4" class="text-center py-4 text-muted">No monthly data available.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0"><h5 class="mb-0">Assembly Report</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern mb-0">
+                        <thead><tr><th>Status</th><th>Materials</th><th>Quantity Assembled</th></tr></thead>
+                        <tbody>
+                            {% for row in report_data.assembly_report %}
+                                <tr><td>{{ row.status }}</td><td>{{ row.materials }}</td><td>{{ row.assembled }}</td></tr>
+                            {% else %}
+                                <tr><td colspan="3" class="text-center py-4 text-muted">No assembly data available.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0"><h5 class="mb-0">Total Delivered Report</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern mb-0">
+                        <thead><tr><th>Material Type</th><th>Materials Delivered</th><th>Quantity Delivered</th></tr></thead>
+                        <tbody>
+                            {% for row in report_data.delivered_report %}
+                                <tr><td>{{ row.material_type }}</td><td>{{ row.materials }}</td><td>{{ row.quantity }}</td></tr>
+                            {% else %}
+                                <tr><td colspan="3" class="text-center py-4 text-muted">No delivered data available.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card border-0 shadow-sm">
+            <div class="card-header bg-white border-0"><h5 class="mb-0">Material Type Report</h5></div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern mb-0">
+                        <thead>
+                            <tr>
+                                <th>Material Type</th>
+                                <th>Material Count</th>
+                                <th>Produced</th>
+                                <th>Assembled</th>
+                                <th>Delivered</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for row in report_data.material_type_report %}
+                                <tr>
+                                    <td>{{ row.material_type }}</td>
+                                    <td>{{ row.count }}</td>
+                                    <td>{{ row.produced }}</td>
+                                    <td>{{ row.assembled }}</td>
+                                    <td>{{ row.delivered }}</td>
+                                </tr>
+                            {% else %}
+                                <tr><td colspan="5" class="text-center py-4 text-muted">No material type data available.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

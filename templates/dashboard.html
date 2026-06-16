@@ -1,0 +1,306 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row g-4 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="kpi-label">Total Materials Produced</p>
+                <h3 class="kpi-value">{{ dashboard_data.kpis.total_produced }}</h3>
+                <span class="kpi-badge success">Production Output</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="kpi-label">Total Materials Assembled</p>
+                <h3 class="kpi-value">{{ dashboard_data.kpis.total_assembled }}</h3>
+                <span class="kpi-badge info">Assembly Status</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="kpi-label">Total Materials Delivered</p>
+                <h3 class="kpi-value">{{ dashboard_data.kpis.total_delivered }}</h3>
+                <span class="kpi-badge primary">Delivery Output</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="kpi-label">Pending Assembly Count</p>
+                <h3 class="kpi-value">{{ dashboard_data.kpis.pending_assembly_count }}</h3>
+                <span class="kpi-badge warning">Action Needed</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="kpi-label">Pending Delivery Count</p>
+                <h3 class="kpi-value">{{ dashboard_data.kpis.pending_delivery_count }}</h3>
+                <span class="kpi-badge danger">Dispatch Queue</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="kpi-label">Total Material Types</p>
+                <h3 class="kpi-value">{{ dashboard_data.kpis.total_material_types }}</h3>
+                <span class="kpi-badge secondary">Catalog Coverage</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="kpi-label">Daily Production Count</p>
+                <h3 class="kpi-value">{{ dashboard_data.kpis.daily_production_count }}</h3>
+                <span class="kpi-badge success">Today</span>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="kpi-card card border-0 shadow-sm h-100">
+            <div class="card-body">
+                <p class="kpi-label">Monthly Production Count</p>
+                <h3 class="kpi-value">{{ dashboard_data.kpis.monthly_production_count }}</h3>
+                <span class="kpi-badge info">This Month</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4 mb-4">
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+                <h5 class="mb-1">Daily Production Trend</h5>
+                <p class="text-muted small mb-0">Produced quantities over the last 7 days</p>
+            </div>
+            <div class="card-body">
+                <canvas id="dailyTrendChart" height="140"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+                <h5 class="mb-1">Delivered vs Assembled</h5>
+                <p class="text-muted small mb-0">Overall output comparison</p>
+            </div>
+            <div class="card-body">
+                <canvas id="deliveredChart" height="140"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+                <h5 class="mb-1">Material Type Distribution</h5>
+                <p class="text-muted small mb-0">Produced quantity by material type</p>
+            </div>
+            <div class="card-body">
+                <canvas id="materialDistributionChart" height="140"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-6">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 pb-0">
+                <h5 class="mb-1">Production History</h5>
+                <p class="text-muted small mb-0">Produced, assembled and delivered over the last 12 days</p>
+            </div>
+            <div class="card-body">
+                <canvas id="historyChart" height="140"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-xl-7">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">Recent Materials</h5>
+                    <p class="text-muted small mb-0">Latest manufacturing activity</p>
+                </div>
+                <a href="{{ url_for('main.materials') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Name</th>
+                                <th>Type</th>
+                                <th>Produced</th>
+                                <th>Assembly</th>
+                                <th>Delivery</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for material in recent_materials %}
+                                <tr>
+                                    <td>#{{ material.id }}</td>
+                                    <td>{{ material.material_name }}</td>
+                                    <td>{{ material.material_type }}</td>
+                                    <td>{{ material.quantity_produced }}</td>
+                                    <td><span class="badge text-bg-{{ badge_class(material.assembly_status) }}">{{ material.assembly_status }}</span></td>
+                                    <td><span class="badge text-bg-{{ badge_class(material.delivery_status) }}">{{ material.delivery_status }}</span></td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-4 text-muted">No materials found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-xl-5">
+        <div class="card border-0 shadow-sm h-100">
+            <div class="card-header bg-white border-0 d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">Inventory Watchlist</h5>
+                    <p class="text-muted small mb-0">Lowest remaining stock items</p>
+                </div>
+                <a href="{{ url_for('main.inventory') }}" class="btn btn-sm btn-outline-primary">Open Inventory</a>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-modern align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Item</th>
+                                <th>Category</th>
+                                <th>Remaining</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in low_inventory_items %}
+                                <tr>
+                                    <td>{{ item.item_name }}</td>
+                                    <td>{{ item.category }}</td>
+                                    <td>
+                                        <span class="badge {% if item.remaining_quantity < 50 %}text-bg-danger{% else %}text-bg-success{% endif %}">
+                                            {{ item.remaining_quantity }}
+                                        </span>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="3" class="text-center py-4 text-muted">No inventory records found.</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+<script>
+    const dashboardCharts = {{ dashboard_data.charts | tojson }};
+
+    const chartPalette = {
+        blue: '#3563e9',
+        teal: '#10b981',
+        orange: '#f59e0b',
+        red: '#ef4444',
+        purple: '#8b5cf6',
+        gray: '#64748b'
+    };
+
+    new Chart(document.getElementById('dailyTrendChart'), {
+        type: 'line',
+        data: {
+            labels: dashboardCharts.daily_trend.labels,
+            datasets: [{
+                label: 'Produced',
+                data: dashboardCharts.daily_trend.values,
+                borderColor: chartPalette.blue,
+                backgroundColor: 'rgba(53, 99, 233, 0.15)',
+                fill: true,
+                tension: 0.35
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('deliveredChart'), {
+        type: 'doughnut',
+        data: {
+            labels: dashboardCharts.delivered_vs_assembled.labels,
+            datasets: [{
+                data: dashboardCharts.delivered_vs_assembled.values,
+                backgroundColor: [chartPalette.teal, chartPalette.orange]
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('materialDistributionChart'), {
+        type: 'bar',
+        data: {
+            labels: dashboardCharts.material_distribution.labels,
+            datasets: [{
+                label: 'Produced Quantity',
+                data: dashboardCharts.material_distribution.quantities,
+                backgroundColor: [
+                    chartPalette.blue,
+                    chartPalette.teal,
+                    chartPalette.orange,
+                    chartPalette.red,
+                    chartPalette.purple,
+                    '#06b6d4',
+                    '#84cc16',
+                    '#f97316'
+                ]
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+
+    new Chart(document.getElementById('historyChart'), {
+        type: 'line',
+        data: {
+            labels: dashboardCharts.production_history.labels,
+            datasets: [
+                {
+                    label: 'Produced',
+                    data: dashboardCharts.production_history.produced,
+                    borderColor: chartPalette.blue,
+                    tension: 0.35
+                },
+                {
+                    label: 'Assembled',
+                    data: dashboardCharts.production_history.assembled,
+                    borderColor: chartPalette.teal,
+                    tension: 0.35
+                },
+                {
+                    label: 'Delivered',
+                    data: dashboardCharts.production_history.delivered,
+                    borderColor: chartPalette.orange,
+                    tension: 0.35
+                }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+</script>
+{% endblock %}

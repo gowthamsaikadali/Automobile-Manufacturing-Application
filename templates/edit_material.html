@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card border-0 shadow-sm">
+    <div class="card-header bg-white border-0">
+        <h5 class="mb-1">Edit Material #{{ material.id }}</h5>
+        <p class="text-muted small mb-0">Update manufacturing, assembly and delivery details</p>
+    </div>
+    <div class="card-body">
+        <form method="post" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <label class="form-label">{{ form.material_name.label.text }}</label>
+                    {{ form.material_name(class='form-control', placeholder='Enter material name') }}
+                    {% for error in form.material_name.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ form.material_type.label.text }}</label>
+                    {{ form.material_type(class='form-select') }}
+                    {% for error in form.material_type.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label">{{ form.category.label.text }}</label>
+                    {{ form.category(class='form-select') }}
+                    {% for error in form.category.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.quantity_produced.label.text }}</label>
+                    {{ form.quantity_produced(class='form-control', min='0') }}
+                    {% for error in form.quantity_produced.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.quantity_assembled.label.text }}</label>
+                    {{ form.quantity_assembled(class='form-control', min='0') }}
+                    {% for error in form.quantity_assembled.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.quantity_delivered.label.text }}</label>
+                    {{ form.quantity_delivered(class='form-control', min='0') }}
+                    {% for error in form.quantity_delivered.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.manufacture_date.label.text }}</label>
+                    {{ form.manufacture_date(class='form-control') }}
+                    {% for error in form.manufacture_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.assembly_date.label.text }}</label>
+                    {{ form.assembly_date(class='form-control') }}
+                    {% for error in form.assembly_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.delivery_date.label.text }}</label>
+                    {{ form.delivery_date(class='form-control') }}
+                    {% for error in form.delivery_date.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.production_status.label.text }}</label>
+                    {{ form.production_status(class='form-select') }}
+                    {% for error in form.production_status.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.assembly_status.label.text }}</label>
+                    {{ form.assembly_status(class='form-select') }}
+                    {% for error in form.assembly_status.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label">{{ form.delivery_status.label.text }}</label>
+                    {{ form.delivery_status(class='form-select') }}
+                    {% for error in form.delivery_status.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label">{{ form.remarks.label.text }}</label>
+                    {{ form.remarks(class='form-control', rows='4', placeholder='Optional remarks, inspection notes, or dispatch comments') }}
+                    {% for error in form.remarks.errors %}<div class="text-danger small mt-1">{{ error }}</div>{% endfor %}
+                </div>
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+                {{ form.submit(class='btn btn-primary', value='Update Material') }}
+                <a href="{{ url_for('main.materials') }}" class="btn btn-outline-secondary">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
