@@ -1,21 +1,19 @@
 [Unit]
-Description=Gunicorn service for Automobile Manufacturing Dashboard
+Description=Gunicorn instance for Automobile Manufacturing Dashboard
 After=network.target
 
 [Service]
-User=ec2-user
-Group=nginx
-WorkingDirectory=/opt/automobile-manufacturing-app
-Environment="PATH=/opt/automobile-manufacturing-app/.venv/bin"
-ExecStart=/opt/automobile-manufacturing-app/.venv/bin/gunicorn \
-    --workers 3 \
-    --timeout 120 \
-    --bind unix:/run/automobile-manufacturing-app.sock \
-    --access-logfile - \
-    --error-logfile - \
-    wsgi:app
+User=appuser
+Group=www-data
+WorkingDirectory=/opt/forgepoint
+EnvironmentFile=/opt/forgepoint/.env
+ExecStart=/opt/forgepoint/venv/bin/gunicorn --workers 3 --bind 127.0.0.1:8001 --access-logfile - --error-logfile - wsgi:app
 Restart=always
-RestartSec=5
+RestartSec=3
+
+# Hardening (safe defaults for a Flask app under systemd)
+NoNewPrivileges=true
+PrivateTmp=true
 
 [Install]
 WantedBy=multi-user.target
